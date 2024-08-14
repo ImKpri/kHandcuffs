@@ -19,6 +19,7 @@ AddEventHandler('cuffPlayer', function(targetId, position, time)
     if isJobAuthorized(xPlayer) then
         local xTarget = ESX.GetPlayerFromId(targetId)
         if xTarget then
+            if time then
             local cuffEndTime = os.time() + (time * 60)
 
             MySQL.Async.execute('INSERT INTO user_cuffs (identifier, position, cuff_end_time) VALUES (@identifier, @position, @cuff_end_time) ON DUPLICATE KEY UPDATE position = @position, cuff_end_time = @cuff_end_time', {
@@ -26,6 +27,7 @@ AddEventHandler('cuffPlayer', function(targetId, position, time)
                 ['@position'] = position,
                 ['@cuff_end_time'] = cuffEndTime
             })
+            end
             TriggerClientEvent('applyCuffs', xTarget.source, position, time)
         end
     else
