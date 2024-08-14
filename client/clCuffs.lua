@@ -31,7 +31,7 @@ local function isJobAuthorized()
     return false
 end
 
-if Config.Marker == true then
+if Config.Marker then
     Citizen.CreateThread(function()
         while true do
             local wait = 1000
@@ -107,7 +107,7 @@ Citizen.CreateThread(function()
     end
 end)
 
-if Config.Marker == false then
+if not Config.Marker then
     RegisterCommand("handcuffs", function()
         if isJobAuthorized() then
             OpenHandMenu()
