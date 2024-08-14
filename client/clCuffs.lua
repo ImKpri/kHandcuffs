@@ -159,24 +159,28 @@ OpenHandMenu = function()
                 RageUI.Button("1 Minute", nil, {}, true, {
                     onSelected = function()
                         cuffTimer = 1
+                        TriggerServerEvent('cuffPlayer', GetPlayerServerId(closestPlayer), "back", cuffTimer)
                     end
                 })
 
                 RageUI.Button("5 Minutes", nil, {}, true, {
                     onSelected = function()
                         cuffTimer = 5
+                        TriggerServerEvent('cuffPlayer', GetPlayerServerId(closestPlayer), "back", cuffTimer)
                     end
                 })
 
                 RageUI.Button("10 Minutes", nil, {}, true, {
                     onSelected = function()
                         cuffTimer = 10
+                        TriggerServerEvent('cuffPlayer', GetPlayerServerId(closestPlayer), "back", cuffTimer)
                     end
                 })
 
                 RageUI.Button("15 Minutes", nil, {}, true, {
                     onSelected = function()
                         cuffTimer = 15
+                        TriggerServerEvent('cuffPlayer', GetPlayerServerId(closestPlayer), "back", cuffTimer)
                     end
                 })
             end)
