@@ -19,13 +19,13 @@ AddEventHandler('cuffPlayer', function(targetId, position, time)
     if isJobAuthorized(xPlayer) then
         local xTarget = ESX.GetPlayerFromId(targetId)
         if xTarget then
-            if time then
-            MySQL.Async.execute('INSERT INTO user_cuffs (identifier, position, time) VALUES (@identifier, @position, @time) ON DUPLICATE KEY UPDATE position = @position, time = @time', {
+            local cuffEndTime = os.time() + (time * 60)
+
+            MySQL.Async.execute('INSERT INTO user_cuffs (identifier, position, cuff_end_time) VALUES (@identifier, @position, @cuff_end_time) ON DUPLICATE KEY UPDATE position = @position, cuff_end_time = @cuff_end_time', {
                 ['@identifier'] = xTarget.identifier,
                 ['@position'] = position,
-                ['@time'] = time
+                ['@cuff_end_time'] = cuffEndTime
             })
-        end
             TriggerClientEvent('applyCuffs', xTarget.source, position, time)
         end
     else
@@ -52,13 +52,23 @@ end)
 RegisterServerEvent('checkCuffedStatus')
 AddEventHandler('checkCuffedStatus', function()
     local xPlayer = ESX.GetPlayerFromId(source)
-    MySQL.Async.fetchAll('SELECT position, time FROM user_cuffs WHERE identifier = @identifier', {
+    MySQL.Async.fetchAll('SELECT position, cuff_end_time FROM user_cuffs WHERE identifier = @identifier', {
         ['@identifier'] = xPlayer.identifier
     }, function(result)
         if result[1] then
             local position = result[1].position
-            local time = result[1].time
-            TriggerClientEvent('applyCuffs', xPlayer.source, position, time)
+            local cuffEndTime = tonumber(result[1].cuff_end_time)
+            local currentTime = os.time()
+
+            if cuffEndTime > currentTime then
+                local remainingTime = math.ceil((cuffEndTime - currentTime) / 60)
+                TriggerClientEvent('applyCuffs', xPlayer.source, position, remainingTime)
+            else
+                MySQL.Async.execute('DELETE FROM user_cuffs WHERE identifier = @identifier', {
+                    ['@identifier'] = xPlayer.identifier
+                })
+                TriggerClientEvent('uncuff', xPlayer.source)
+            end
         end
     end)
 end)
